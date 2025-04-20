@@ -1,82 +1,107 @@
 ---
 # Create user accounts 
-- hosts: all
-- name: Create users for managers group
-  user:
-    name: manager1
-    group: managers
-    state: present
-  user:  
-    name: manager2
-    group: managers
-    state: present
+- name: Create new users accounts
+  hosts: my_hosts  
+  remote_user: ansible-target1
+  
+  tasks:
+  - name: Create user accounts for manager1 and manager2 
+    user:
+      name: manager1
+      group: managers
+      state: latest
+ 
+    user:
+      name: manager2
+      group: managers
+      state: latest
 
-- name: Create users for admins with sudo access
-  become: yes
-  user:
-    name: admin
-    group: admins with sudo access
-    state: present
+  - name: Create users for admins with sudo access
+    become: yes 
+    user:
+      name: admin
+      group: admins with sudo access
+      state: latest
 
-- name: Create users for devs with no sudo access
-  user:
-    name: user  
-    group: devs with no sudo access
-  become: yes
-
+  - name: Create users for devs with no sudo access
+    user:
+      name: user  
+      group: devs with no sudo access
+      state: latest
+  
 # Install software needed for devolopers  
-- name: "Install software packages for developers
-  package: 
-    name: 
-      - git
-      - vim
-      - curl 
-      - htop
-      - tree
-      - tmux
-      - unzip 
-      - docker.io
-    state: latest  
+- name: Install software packages for developers
+  hosts: my_hosts
+  remote_user: ansible-target1
+  
+  tasks:
+  - name: Install specific software packages
+    package: 
+      name: 
+        - git
+        - vim
+        - curl 
+        - htop
+        - tree
+        - tmux
+        - unzip 
+        - docker.io
+      state: latest  
 
-# Set MOTD  
+# Set a MOTD  
 - name: Set MOTD
+  hosts: my_hosts  
+  remote_user: ansible-target1
+
+  tasks:
     path:/etc/motd
     line:"Welcome to the DevOps workstation."
-  become: yes
+ 
 
-# Set Hostname  
-- name: Set a hostname 
-  hosts: all
+# Set a Hostname  
+- name: Set a hostname for Ubuntu
+  hosts: my_hosts  
+  remote_user: ansible-target1
+
   tasks:
-    - name: Set hostname to "devops_1"
-      ansible.builtin.hostname:
-        name: devops_1
-        use: Ubuntu       
+  - name: Set hostname to "devops_1"
+    ansible.builtin.hostname:
+      name: devops_1
+      use: Ubuntu       
 
-- name: Set a hostname 
-  hosts: all
+- name: Set a hostname for CentOS
+  hosts: my_hosts  
+  remote_user: ansible-target1
+
   tasks:
-    - name: Set hostname to "devops_2"
-      ansible.builtin.hostname:
-        name: devops_2
-        use: CentOS
+  - name: Set hostname to "devops_2"
+    ansible.builtin.hostname:
+      name: devops_2
+      use: CentOS
 
-# Set timezone to UTC     
+# Set timezone to UTC 
 - name: Set timezone to UTC
-  community.general.timezone:
-    name: Etc/UTC
+  hosts: my_hosts  
+  remote_user: ansible-target1
 
-#Special requirement     
-- hosts: target
-  become: true
   tasks:
-    - name: Create MariaDB user
-        name: 'admin'
-        host: 'localhost'
-        state: present
-        password: your_strong_password
+  - name: Set a timezone to UTC
+    community.general.timezone:
+      name: Etc/UTC
 
-    - name: Grant privileges to MariaDB user
-        name: 'admin'
-        host: 'localhost'
-        state: present   
+# Special requirement 
+- name: Install MariaDB 
+  hosts: my_hosts  
+  remote_user: ansible-target1
+
+  tasks:
+  - name: Create MariaDB with admin user 
+      user:'admin'
+      host:'localhost'
+      state:present
+      password:your_strong_password
+
+  - name: Grant privileges to MariaDB user
+      user:'admin'
+      host:'localhost'
+      state:present   
