@@ -1,6 +1,6 @@
 ---
-# Create user accounts 
-- name: Create new users accounts
+# Create user accounts
+- name: Create new users accounts 
   hosts: my_hosts  
   remote_user: ansible-target1
   
@@ -48,17 +48,19 @@
         - docker.io
       state: latest  
 
-# Set a MOTD  
+# Set MOTD  
 - name: Set MOTD
   hosts: my_hosts  
   remote_user: ansible-target1
 
   tasks:
-    path:/etc/motd
-    line:"Welcome to the DevOps workstation."
+  - name: Set MOTD 
+    file:
+      path: /etc/motd
+      line: "Welcome to the DevOps workstation."
  
 
-# Set a Hostname  
+# Set Hostname  
 - name: Set a hostname for Ubuntu
   hosts: my_hosts  
   remote_user: ansible-target1
@@ -96,12 +98,16 @@
 
   tasks:
   - name: Create MariaDB with admin user 
-      user:'admin'
-      host:'localhost'
-      state:present
-      password:your_strong_password
+    user:
+      name: admin
+      host: 'localhost'
+
+      state: present
+      password: your_strong_password
 
   - name: Grant privileges to MariaDB user
-      user:'admin'
-      host:'localhost'
-      state:present   
+    user:
+      name: admin
+      host: 'localhost'
+
+      state: present
