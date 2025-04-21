@@ -1,38 +1,50 @@
 ---
 # Create user accounts
 - name: Create new users accounts 
-  hosts: my_hosts  
-  remote_user: ansible-target1
+  hosts: localhost 
+  remote_user: ansibletarget1
   
   tasks:
-  - name: Create user accounts for manager1 and manager2 
-    user:
-      name: manager1
-      group: managers
-      state: latest
+  - name: create managers group
+    group:
+      name: managers
+      state: present
  
+  - name: create manage user  
+    user:  
+      name: manager1
+      state: present
+
+  - name: create manager user
     user:
       name: manager2
-      group: managers
-      state: latest
+      state: present
 
-  - name: Create users for admins with sudo access
-    become: yes 
+  - name: create admins group with sudo access
+    become: yes
+    group:
+      name: admins with sudo access
+      state: present
+
+  - name: create admin user
     user:
       name: admin
-      group: admins with sudo access
-      state: latest
+      state: present
 
-  - name: Create users for devs with no sudo access
-    user:
-      name: user  
-      group: devs with no sudo access
-      state: latest
+  - name: create devs group with no sudo access
+    group:
+      name: devs with no sudo access  
+      state: present
   
+  - name: create devs user
+    user:
+      name: devs
+      state: present
+
 # Install software needed for devolopers  
 - name: Install software packages for developers
-  hosts: my_hosts
-  remote_user: ansible-target1
+  hosts: localhost
+  remote_user: ansibletarget1
   
   tasks:
   - name: Install specific software packages
@@ -50,8 +62,8 @@
 
 # Set MOTD  
 - name: Set MOTD
-  hosts: my_hosts  
-  remote_user: ansible-target1
+  hosts: localhost  
+  remote_user: ansibletarget1
 
   tasks:
   - name: Set MOTD 
@@ -62,8 +74,8 @@
 
 # Set Hostname  
 - name: Set a hostname for Ubuntu
-  hosts: my_hosts  
-  remote_user: ansible-target1
+  hosts: localhost  
+  remote_user: ansibletarget1
 
   tasks:
   - name: Set hostname to "devops_1"
@@ -72,8 +84,8 @@
       use: Ubuntu       
 
 - name: Set a hostname for CentOS
-  hosts: my_hosts  
-  remote_user: ansible-target1
+  hosts: localhost  
+  remote_user: ansibletarget1
 
   tasks:
   - name: Set hostname to "devops_2"
@@ -83,8 +95,8 @@
 
 # Set timezone to UTC 
 - name: Set timezone to UTC
-  hosts: my_hosts  
-  remote_user: ansible-target1
+  hosts: localhost  
+  remote_user: ansibletarget1
 
   tasks:
   - name: Set a timezone to UTC
@@ -93,8 +105,8 @@
 
 # Special requirement 
 - name: Install MariaDB 
-  hosts: my_hosts  
-  remote_user: ansible-target1
+  hosts: localhost  
+  remote_user: ansibletarget1
 
   tasks:
   - name: Create MariaDB with admin user 
@@ -110,4 +122,4 @@
       name: admin
       host: 'localhost'
 
-      state: present
+      state: present 
