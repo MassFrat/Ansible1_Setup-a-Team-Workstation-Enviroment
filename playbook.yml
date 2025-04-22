@@ -16,12 +16,12 @@
  
     - name: Create Manager Users  
       user:  
-        name: "{{ item }}"   
+        name: "{{ item }}"
         state: present
         group: managers
-        groups "{{ 'wheel' if ansible_os_family == 'RedHat' else 'sudo' }}"
+        groups: "{{ 'wheel' if ansible_os_family == 'RedHat' else 'sudo' }}"    
         append: yes 
-      loops:
+      loop:
         - manager 1
         - manager 2
 
