@@ -1,125 +1,100 @@
 ---
-# Create user accounts
-- name: Create new users accounts 
-  hosts: localhost 
-  remote_user: ansibletarget1
-  
+- name: Create User Accounts and Provision Servers
+  hosts: all 
+  become: yes 
+
+# Task 1  
   tasks:
-  - name: create managers group
-    group:
-      name: managers
-      state: present
+    - name: Create Managers, Admins and Devs groups
+      group:
+        name: "{{ item }}"
+        state: present
+        loop:
+          - managers 
+          - admins 
+          - devs 
  
-  - name: create manage user  
-    user:  
-      name: manager1
-      state: present
+    - name: Create Manager Users  
+      user:  
+        name: "{{ item }}"   
+        state: present
+        group: managers
+        groups "{{ 'wheel' if ansible_os_family == 'RedHat' else 'sudo' }}"
+        append: yes 
+      loops:
+        - manager 1
+        - manager 2
 
-  - name: create manager user
-    user:
-      name: manager2
-      state: present
+    - name: Create Admins Users with sudo access
+      user:
+        name: admin
+        state: present
+        group: admins
+        groups: "{{ 'wheel' if ansible_os_family == 'RedHat' else 'sudo' }}"
+        append: yes 
 
-  - name: create admins group with sudo access
-    become: yes
-    group:
-      name: admins with sudo access
-      state: present
+    - name: Create Devs Users with no sudo access
+      user:
+        name: user
+        group: devs
 
-  - name: create admin user
-    user:
-      name: admin
-      state: present
-
-  - name: create devs group with no sudo access
-    group:
-      name: devs with no sudo access  
-      state: present
-  
-  - name: create devs user
-    user:
-      name: devs
-      state: present
-
-# Install software needed for devolopers  
-- name: Install software packages for developers
-  hosts: localhost
-  remote_user: ansibletarget1
-  
-  tasks:
-  - name: Install specific software packages
-    package: 
-      name: 
-        - git
+# Task 2
+    - name: Install Software for Developers
+      package:
+        name: "{{ item }}"
+        state: present
+      loop:
         - vim
-        - curl 
-        - htop
+        - nano
+        - git
+        - curl
         - tree
+        - vim
         - tmux
-        - unzip 
-        - docker.io
-      state: latest  
+        - unzip
 
-# Set MOTD  
-- name: Set MOTD
-  hosts: localhost  
-  remote_user: ansibletarget1
+# Task 3
+    - name: Set MOTD 
+      shell: echo 'Welcome to the DevOps workstation.' > /etc/motd
+      args:
+        creates: /etc/motd
 
-  tasks:
-  - name: Set MOTD 
-    file:
-      path: /etc/motd
-      line: "Welcome to the DevOps workstation."
- 
+# Task 4
+    - name: Set Hostname to "devops_1" for Ubuntu
+      hostname:
+        name: devops1
+      when: ansible_facts['os_family'] == "Debian"
 
-# Set Hostname  
-- name: Set a hostname for Ubuntu
-  hosts: localhost  
-  remote_user: ansibletarget1
+    - name: Set Hostname to "devops_2" for CentOS
+      hostname:
+        name: devops2
+      when: ansible_facts['os_family'] == "RedHat"
 
-  tasks:
-  - name: Set hostname to "devops_1"
-    ansible.builtin.hostname:
-      name: devops_1
-      use: Ubuntu       
+# Task 5
+    - name: Set timezone to UTC
+      timezone:
+        name: UTC
 
-- name: Set a hostname for CentOS
-  hosts: localhost  
-  remote_user: ansibletarget1
+# Task 6
+    - name: Install MariaDB on Ubuntu
+      apt:
+        name: mariadb-server
+        state: present
+        update_cache: yes 
+      when: ansible_facts['os_family'] == 'Debian'
 
-  tasks:
-  - name: Set hostname to "devops_2"
-    ansible.builtin.hostname:
-      name: devops_2
-      use: CentOS
+    - name: Install MariaDB on CentOS
+      yum:
+        name: mariadb-server
+        state: present
+        update_cache: yes 
+      when: ansible_facts['os_family'] == 'RedHat'
 
-# Set timezone to UTC 
-- name: Set timezone to UTC
-  hosts: localhost  
-  remote_user: ansibletarget1
-
-  tasks:
-  - name: Set a timezone to UTC
-    community.general.timezone:
-      name: Etc/UTC
-
-# Special requirement 
-- name: Install MariaDB 
-  hosts: localhost  
-  remote_user: ansibletarget1
-
-  tasks:
-  - name: Create MariaDB with admin user 
-    user:
-      name: admin
-      host: 'localhost'
-
-      state: present
-      password: your_strong_password
-
-  - name: Grant privileges to MariaDB user
-    user:
-      name: admin
-      host: 'localhost'
-
-      state: present 
+    - name: Try to create database as root/nopassword first. If not allowed, pass the credentials
+      mysql_db:
+        check_implicit_admin: true 
+        login_user: bob
+        login_password: 123456
+        name: bobdata
+        state: present
+      when: ansible_facts['os_family'] == 'Debian'
