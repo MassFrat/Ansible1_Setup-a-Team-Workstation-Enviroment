@@ -76,13 +76,4 @@
         name: mariadb-server
         state: present
         update_cache: yes 
-      when: ansible_facts['os_family'] == 'RedHat'
-
-    - name: Try to create database as root/nopassword first. If not allowed, pass the credentials
-      mysql_db:
-        check_implicit_admin: true 
-        login_user: bob
-        login_password: 123456
-        name: bobdata
-        state: present
-      when: ansible_facts['os_family'] == 'Debian'
+      when: ansible_facts['os_family'] == 'RedHat' 
