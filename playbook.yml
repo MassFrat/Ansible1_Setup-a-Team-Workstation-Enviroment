@@ -9,10 +9,10 @@
       group:
         name: "{{ item }}"
         state: present
-        loop:
-          - managers 
-          - admins 
-          - devs 
+      loop:
+        - managers 
+        - admins 
+        - devs 
  
     - name: Create Manager Users  
       user:  
@@ -22,8 +22,8 @@
         groups: "{{ 'wheel' if ansible_os_family == 'RedHat' else 'sudo' }}"    
         append: yes 
       loop:
-        - manager 1
-        - manager 2
+        - manager1
+        - manager2
 
     - name: Create Admins Users with sudo access
       user:
