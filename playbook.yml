@@ -60,14 +60,9 @@
         creates: /etc/motd
 
 # Task 4
-    - name: Set Hostname to "devops_1" for Ubuntu
+    - name: Set Hostname to "devops_1" for CentOS
       hostname:
         name: devops1
-      when: ansible_facts['os_family'] == "Debian"
-
-    - name: Set Hostname to "devops_2" for CentOS
-      hostname:
-        name: devops2
       when: ansible_facts['os_family'] == "RedHat"
 
 # Task 5
@@ -76,13 +71,6 @@
         name: UTC
 
 # Task 6
-    - name: Install MariaDB on Ubuntu
-      apt:
-        name: mariadb-server
-        state: present
-        update_cache: yes 
-      when: ansible_facts['os_family'] == 'Debian'
-
     - name: Install MariaDB on CentOS
       yum:
         name: mariadb-server
