@@ -2,7 +2,7 @@
 - name: Create User Accounts and Provision Servers
   hosts: all 
   become: yes 
-
+  
 # Task 1  
   tasks:
     - name: Create Managers, Admins and Devs groups
@@ -76,4 +76,4 @@
         name: mariadb-server
         state: present
         update_cache: yes 
-      when: ansible_facts['os_family'] == 'RedHat' 
+      when: ansible_facts['os_family'] == 'RedHat'
