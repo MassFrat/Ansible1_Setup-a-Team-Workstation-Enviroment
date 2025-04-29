@@ -1,0 +1,16 @@
+developers:
+  - name: manager1
+    group: managers
+    sudo: yes 
+
+  - name: manager2
+    group: managers
+    sudo: yes 
+
+  - name: admin
+    group: admins
+    sudo: yes 
+
+  - name: user
+    group: devs
+    sudo: false 
