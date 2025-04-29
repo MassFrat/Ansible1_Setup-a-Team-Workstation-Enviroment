@@ -2,7 +2,9 @@
 - name: Create User Accounts and Provision Servers
   hosts: all 
   become: yes 
-  
+  vars_files:
+    - secrets.yml 
+
 #Task1  
   tasks:
     - name: Create Managers, Admins and Devs groups
@@ -25,7 +27,7 @@
         - manager1
         - manager2
 
-    - name: Create Admins Users with sudo access
+    - name: Create Admins Users 
       user:
         name: admin
         state: present
@@ -33,7 +35,7 @@
         groups: "{{ 'wheel' if ansible_os_family == 'RedHat' else 'sudo' }}"
         append: yes 
 
-    - name: Create Devs Users with no sudo access
+    - name: Create Devs Users 
       user:
         name: user
         group: devs
@@ -65,6 +67,11 @@
         name: devops1
       when: ansible_facts['os_family'] == "RedHat"
 
+    - name: Set Hostname to "devops_2" for Ubuntu
+      hostname:
+        name: devops2
+      when: ansible_facts['os_family'] == "Debian"
+     
 #Task5
     - name: Set timezone to UTC
       timezone:
@@ -77,3 +84,28 @@
         state: present
         update_cache: yes 
       when: ansible_facts['os_family'] == 'RedHat'
+
+    - name: Install MariaDB on Ubuntu/Debian
+      apt:
+        name: mariadb-server
+        state: present
+        update_cache: yes 
+      when: ansible_facts['os_family'] == 'Debian'    
+     
+    - name: Create a new database with name 'bobdata'
+      mysql_db:
+        name: bobdata
+        state: present
+        login_unix_socket: /run/mysqld/mysqld.sock
+      when: ansible_facts['os_family'] == 'Debian'
+
+    - name: Create (or update) MariaDB user bobuser on Debian
+      mysql_user:
+        name: bobuser
+        password: "{{ db_pass }}"
+        priv: '*.*:ALL'
+        state: present
+        login_user: root
+        login_password: "{{ db_root_pass }}"
+        login_unix_socket: /run/mysqld/mysqld.sock
+      when: ansible_facts['os_family'] == 'Debian'
