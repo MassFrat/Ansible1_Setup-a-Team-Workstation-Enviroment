@@ -27,7 +27,7 @@
         - manager1
         - manager2
 
-    - name: Create Admins Users 
+    - name: Create Admins Users
       user:
         name: admin
         state: present
@@ -35,7 +35,7 @@
         groups: "{{ 'wheel' if ansible_os_family == 'RedHat' else 'sudo' }}"
         append: yes 
 
-    - name: Create Devs Users 
+    - name: Create Devs Users
       user:
         name: user
         group: devs
@@ -56,7 +56,7 @@
         - unzip
 
 #Task3
-    - name: Set MOTD 
+    - name: Set MOTD
       shell: echo 'Welcome to the DevOps workstation.' > /etc/motd
       args:
         creates: /etc/motd
@@ -71,7 +71,7 @@
       hostname:
         name: devops2
       when: ansible_facts['os_family'] == "Debian"
-     
+
 #Task5
     - name: Set timezone to UTC
       timezone:
@@ -90,8 +90,13 @@
         name: mariadb-server
         state: present
         update_cache: yes 
-      when: ansible_facts['os_family'] == 'Debian'    
-     
+      when: ansible_facts['os_family'] == 'Debian'
+
+    - name: Create a new database with name 'bobdata'
+      mysql_db:
+        name: bobdata
+        state: present
+  
     - name: Create a new database with name 'bobdata'
       mysql_db:
         name: bobdata
