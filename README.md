@@ -17,6 +17,7 @@ Sudo privileges for the user Ansible will connect as
 
 Project Structure
 
+```bash
 ansible-workstation/
 ├── inventory/
 │   ├── hosts.yml
