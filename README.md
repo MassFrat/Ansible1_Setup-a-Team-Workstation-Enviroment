@@ -16,3 +16,24 @@ Python installed (most modern distributions include this)
 Sudo privileges for the user Ansible will connect as
 
 Project Structure
+
+ansible-workstation/
+├── inventory/
+│   ├── hosts.yml
+│   └── group_vars/
+│       ├── all.yml
+│       ├── developers.yml
+│       └── designers.yml
+├── playbooks/
+│   ├── main.yml
+│   ├── base-setup.yml
+│   ├── development-tools.yml
+│   └── security-hardening.yml
+├── roles/
+│   ├── common/
+│   ├── docker/
+│   ├── nodejs/
+│   ├── python/
+│   └── vscode/
+├── ansible.cfg
+└── README.md
